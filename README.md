@@ -153,6 +153,15 @@ keytool -list \
     -storepass serverpass
 
 # You should see: server, ..., PrivateKeyEntry
+
+# Create server truststore (for client certificate validation if needed)
+keytool -importcert \
+    -alias rootca \
+    -keystore server/truststore.p12 \
+    -storetype PKCS12 \
+    -storepass truststorepass \
+    -file ca/rootca.crt \
+    -noprompt
 ```
 
 ### 1.4 Create Client Trust Store
@@ -707,6 +716,7 @@ logging.level.javax.net.ssl=DEBUG
 ```bash
 # Copy server keystore to server module resources (root level)
 cp certificates/server/server-keystore.p12 server/src/main/resources/
+cp certificates/server/truststore.p12 server/src/main/resources/
 
 # Copy client truststore to client module resources (root level)
 cp certificates/client/client-truststore.p12 client/src/main/resources/

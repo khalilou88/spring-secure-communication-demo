@@ -44,7 +44,7 @@ secure-communication-demo/
 
 ```bash
 # Create certificates directory structure
-mkdir -p certificates/{ca,intermediate,server}
+mkdir -p certificates/{ca,intermediate,server,client}
 cd certificates
 
 # Generate Root CA private key
@@ -161,7 +161,7 @@ keytool -list \
 # Create client truststore with root CA
 keytool -importcert \
     -alias rootca \
-    -keystore server/client-truststore.p12 \
+    -keystore client/client-truststore.p12 \
     -storetype PKCS12 \
     -storepass truststorepass \
     -file ca/rootca.crt \
@@ -169,7 +169,7 @@ keytool -importcert \
 
 # Verify client truststore
 keytool -list \
-    -keystore server/client-truststore.p12 \
+    -keystore client/client-truststore.p12 \
     -storetype PKCS12 \
     -storepass truststorepass
 ```
@@ -709,7 +709,7 @@ logging.level.javax.net.ssl=DEBUG
 cp certificates/server/server-keystore.p12 server/src/main/resources/
 
 # Copy client truststore to client module resources (root level)
-cp certificates/server/client-truststore.p12 client/src/main/resources/
+cp certificates/client/client-truststore.p12 client/src/main/resources/
 ```
 
 ## Step 6: Build and Run

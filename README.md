@@ -144,7 +144,7 @@ keytool -genkeypair \
     -dname "CN=localhost, OU=IT, O=Demo Corp, L=New York, ST=NY, C=US" \
     -ext SAN=dns:localhost,ip:127.0.0.1 \
     -ext KeyUsage=digitalSignature,keyEncipherment \
-    -ext ExtKeyUsage=serverAuth
+    -ext EKU=serverAuth
 
 # Verify the keystore contains the server key entry
 keytool -list \

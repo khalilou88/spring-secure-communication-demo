@@ -772,6 +772,18 @@ keytool -importcert -alias rootca \
     -file certificates/ca/rootca.crt -noprompt
 ```
 
+try this solution:
+```bash
+# Add our root CA to the system trust store (requires sudo)
+sudo keytool -importcert \
+-alias demo-root-ca \
+-keystore $JAVA_HOME/lib/security/cacerts \
+-storepass changeit \
+-file certificates/ca/rootca.crt \
+-noprompt
+```
+
+
 ### Issue 3: SSL Debug Mode
 
 Run client with detailed SSL debugging:

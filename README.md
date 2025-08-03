@@ -921,3 +921,57 @@ INFO  - Started ServerApplication
 - **Production deployment**: Use proper CA-issued certificates
 
 This setup demonstrates the complete SSL/TLS certificate chain validation process in a Spring Boot application with proper separation of concerns between server authentication (keystore) and client validation (truststore).
+
+
+## Step 7: Verification and Testing
+
+### 7.1 Verify Certificate Chain
+
+```bash
+# Check server certificate chain
+openssl s_client -connect localhost:8443 -servername localhost -showcerts
+
+# Verify certificate chain locally
+openssl verify -CAfile certificates/ca/rootca.crt \
+               -untrusted certificates/intermediate/intermediate.crt \
+               certificates/server/server.crt
+```
+
+### 7.2 Test with curl
+
+```bash
+# Test with proper certificate validation (will fail with self-signed)
+curl -v https://localhost:8443/api/secure/message
+
+# Test with custom CA bundle
+curl --cacert certificates/ca/rootca.crt \
+     -v https://localhost:8443/api/secure/message
+
+# Test health endpoint
+curl --cacert certificates/ca/rootca.crt \
+     -v https://localhost:8443/api/secure/health
+```
+
+### 7.3 Browser Testing
+
+1. Import the Root CA certificate (`certificates/ca/rootca.crt`) into your browser's trusted certificate authorities
+2. Navigate to `https://localhost:8443/api/secure/health`
+3. Verify that the connection is secure and the certificate chain is valid
+
+## Key Learning Points
+
+1. **Certificate Hierarchy**: Proper CA chain with root and intermediate certificates
+2. **Certificate Validation**: How trust chains work in practice
+3. **Spring Boot SSL**: Configuration for both server and client
+4. **Keystore Management**: Different keystores for different purposes
+5. **Production Readiness**: Certificate management best practices
+
+## Security Considerations
+
+- **Certificate Rotation**: Plan for regular certificate updates
+- **Private Key Protection**: Secure storage of private keys
+- **Certificate Monitoring**: Monitor certificate expiration
+- **Trust Store Management**: Proper trust store configuration
+- **Mutual TLS**: Consider client certificate authentication for enhanced security
+
+This comprehensive setup demonstrates enterprise-grade certificate management and secure communication patterns used in production Spring Boot applications.

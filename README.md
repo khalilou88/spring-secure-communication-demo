@@ -131,7 +131,7 @@ keytool -importcert \
 ### 1.3 Create Server Certificate
 
 ```bash
-# Generate Server private key and certificate directly in the final keystore
+# Generate Server private key and certificate
 keytool -genkeypair \
     -alias server \
     -keyalg RSA \
@@ -145,6 +145,53 @@ keytool -genkeypair \
     -ext SAN=dns:localhost,ip:127.0.0.1 \
     -ext KeyUsage=digitalSignature,keyEncipherment \
     -ext EKU=serverAuth
+
+# Generate CSR for server certificate
+keytool -certreq \
+    -alias server \
+    -keystore server/server-keystore.p12 \
+    -storetype PKCS12 \
+    -storepass serverpass \
+    -file server/server.csr
+
+# Sign server certificate with Intermediate CA
+keytool -gencert \
+    -alias intermediateca \
+    -keystore intermediate/intermediate-keystore.p12 \
+    -storetype PKCS12 \
+    -storepass intermediatecapass \
+    -infile server/server.csr \
+    -outfile server/server.crt \
+    -validity 365 \
+    -ext SAN=dns:localhost,ip:127.0.0.1 \
+    -ext KeyUsage=digitalSignature,keyEncipherment \
+    -ext EKU=serverAuth \
+    -rfc
+
+# Import certificate chain into server keystore
+keytool -importcert \
+    -alias rootca \
+    -keystore server/server-keystore.p12 \
+    -storetype PKCS12 \
+    -storepass serverpass \
+    -file ca/rootca.crt \
+    -noprompt
+
+keytool -importcert \
+    -alias intermediateca \
+    -keystore server/server-keystore.p12 \
+    -storetype PKCS12 \
+    -storepass serverpass \
+    -file intermediate/intermediate.crt \
+    -noprompt
+
+keytool -importcert \
+    -alias server \
+    -keystore server/server-keystore.p12 \
+    -storetype PKCS12 \
+    -storepass serverpass \
+    -file server/server.crt \
+    -noprompt
 
 # Verify the keystore contains the server key entry
 keytool -list \
